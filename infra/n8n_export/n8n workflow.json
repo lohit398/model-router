@@ -1,0 +1,288 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "=https://uptappfacscdmxcbtlug.supabase.co/rest/v1/uploaded_files",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "=eq.{{$json[\"body\"][\"fileId\"]}}"
+            },
+            {
+              "name": "select",
+              "value": "*"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwdGFwcGZhY3NjZG14Y2J0bHVnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NzE0NjI0NCwiZXhwIjoyMDgyNzIyMjQ0fQ.-WMY5uYSCLOuWaFaGQQTdRW7QDoe0U0GzQEptXnA2wk"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwdGFwcGZhY3NjZG14Y2J0bHVnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NzE0NjI0NCwiZXhwIjoyMDgyNzIyMjQ0fQ.-WMY5uYSCLOuWaFaGQQTdRW7QDoe0U0GzQEptXnA2wk"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{$json[\"transcript_text\"]}}"
+            },
+            {
+              "name": "language",
+              "value": "={{$json[\"language\"]}}"
+            },
+            {
+              "name": "duration_seconds",
+              "value": "={{$json[\"duration_seconds\"]}}"
+            },
+            {
+              "name": "status",
+              "value": "ready"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0c92071e-710f-43fe-952f-60e9b7e5ce98",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = items[0].json;\nif (Array.isArray(rows) && rows.length > 0) {\n  return [{ json: rows[0] }];\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "33bd4e07-6688-419d-9d0c-c4a09cc89ea4",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "const fileRow = $json;\n\n// Get the original webhook payload from the \"File Uploaded\" node\nconst webhook = $items(\"File Uploaded\", 0, 0)[0].json;; // this json usually has { body: { fileId, transcriptId } }\n\nconst transcriptId = webhook.body.transcriptId;\n\nconst transcriptText = `Mock transcript for ${fileRow.file_name} stored at ${fileRow.storage_path}.\nThis simulates a 60-min call transcript for routing.`;\n\nreturn [{\n  json: {\n    file_id: fileRow.id,\n    transcript_id: transcriptId,\n    transcript_text: transcriptText,\n    language: 'en',\n    duration_seconds: 3600,\n  }\n}];\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "0b0f2df5-9d70-4f31-877c-3b197150c344",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "https://uptappfacscdmxcbtlug.supabase.co/rest/v1/transcripts",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "=eq.{{$json[\"transcript_id\"]}}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apiKey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwdGFwcGZhY3NjZG14Y2J0bHVnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NzE0NjI0NCwiZXhwIjoyMDgyNzIyMjQ0fQ.-WMY5uYSCLOuWaFaGQQTdRW7QDoe0U0GzQEptXnA2wk"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVwdGFwcGZhY3NjZG14Y2J0bHVnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NzE0NjI0NCwiZXhwIjoyMDgyNzIyMjQ0fQ.-WMY5uYSCLOuWaFaGQQTdRW7QDoe0U0GzQEptXnA2wk"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{$json[\"transcript_text\"]}}"
+            },
+            {
+              "name": "language",
+              "value": "={{$json[\"language\"]}}"
+            },
+            {
+              "name": "duration_seconds",
+              "value": "={{$json[\"duration_seconds\"]}}"
+            },
+            {
+              "name": "status",
+              "value": "ready"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "2b19f6dd-6752-4804-a908-7762e264d80d",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://host.docker.internal:4000/api/tasks",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "taskType",
+              "value": "summary"
+            },
+            {
+              "name": "sla",
+              "value": "low_latency"
+            },
+            {
+              "name": "maxCostCents",
+              "value": "50"
+            },
+            {
+              "name": "transcriptId",
+              "value": "={{$json['transcript_id']}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "6d3fe4e8-3869-4f69-984d-9e1de35f4bd0",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "c26797b7-a708-4634-bcdd-7846036044c0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "85ef8842-4465-428c-a54a-943f9e40962e",
+      "name": "File Uploaded",
+      "webhookId": "c26797b7-a708-4634-bcdd-7846036044c0"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "File Uploaded": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "3f3f5125-fd5a-40fd-b233-121206f1ccb8",
+  "meta": {
+    "instanceId": "af3671fc3d205852f106bd12a4be91d8439a21aaf7f6b0c6cc4c4d6a011c1d37"
+  },
+  "id": "x5T0iojW1dfc92cb",
+  "tags": []
+}
